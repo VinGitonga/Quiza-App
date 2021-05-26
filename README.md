@@ -61,9 +61,7 @@
 
 * Finally when the client server has complete starting the development server
 * Open your browser and enter the following url
-  ''''
-  http://localhost:3000
-  ''''
+   'http://localhost:3000'
 
 
 ## Drawbacks
