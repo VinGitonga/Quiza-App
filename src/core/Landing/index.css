@@ -1,0 +1,52 @@
+.landing {
+    position: relative;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.landing-overlay{
+    position: absolute;
+    min-width: 100%;
+    min-height: 100;
+    top: 0;
+    left: 0;
+    background: none;
+}
+
+.landing-desc{
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    margin-top: 30%;
+    padding: 2em;
+}
+
+.landing-title{
+    font-size: 2rem;
+    color: #191970;
+    text-transform: uppercase;
+}
+
+.landing-text{
+    font-size: 20px;
+    color: #46423b;
+    line-height: 1.5;
+    width: 75%;
+}
+
+.landing-extra{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    margin-top: 10px;
+}
+
+.landing-btn {
+    color: #fff;
+    border-radius: 5px;
+    background: #004953;
+    box-shadow: 0px 5px 25px rgba(65, 84, 241, .3);
+}
+
