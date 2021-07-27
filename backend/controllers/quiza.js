@@ -8,10 +8,15 @@ import formidable from "formidable";
 import Question from '../models/question.js'
 import redis from 'redis'
 import Attempt from '../models/attempt.js'
+import config from '../config/config.js'
 
 const REDIS_PORT = 6379
 
-const client = redis.createClient(REDIS_PORT)
+const client = redis.createClient({
+    host: config.REDIS_HOSTNAME,
+    port: config.REDIS_PORT,
+    password: config.REDIS_PASSWORD
+})
 
 const {IncomingForm} = formidable
 
