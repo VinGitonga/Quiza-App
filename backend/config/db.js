@@ -3,7 +3,7 @@ import config from './config.js'
 
 const connectDB = async ()=>{
     try {
-        const conn = await mongoose.connect(config.mongoUri, {
+        const conn = await mongoose.connect(encodeURI('mongodb+srv://Kierstan:Kierstan2021@kierstan.qdcko.mongodb.net/Quiza?retryWrites=true&w=majority'), {
             useUnifiedTopology:true,
             useNewUrlParser:true,
             useCreateIndex:true,
