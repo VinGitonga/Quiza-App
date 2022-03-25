@@ -9,9 +9,25 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/react": "^1.8.6",
+    "@emotion/react": "11",
+    "@emotion/styled": "11",
+    "@fontsource/poppins": "^4.5.3",
+    "axios": "^0.26.1",
+    "cookie": "^0.4.2",
+    "framer-motion": "6",
+    "iron-session": "^6.1.1",
+    "mongoose": "^6.2.6",
     "next": "12.1.0",
+    "next-auth": "^4.3.1",
+    "next-iron-session": "^4.2.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-cookie": "^4.1.1",
+    "react-countdown": "^2.3.2",
+    "react-dom": "17.0.2",
+    "react-icons": "^4.3.1",
+    "redis": "^4.0.4",
+    "swr": "^1.2.2"
   },
   "devDependencies": {
     "eslint": "8.11.0",
