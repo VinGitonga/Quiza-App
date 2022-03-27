@@ -126,10 +126,10 @@ export default function Navbar() {
                         <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/quizzes")}>
                             Quizas
                         </Tab>
-                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/quizzes")}>
+                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/my_quizzes")}>
                             My Quizas
                         </Tab>
-                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/quizzes")}>
+                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/my_submissions")}>
                             My Submissions
                         </Tab>
                         <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/create_quiz")}>

@@ -3,11 +3,11 @@ import { Stack, Text, } from "@chakra-ui/react"
 import Countdown from "react-countdown";
 
 
-const Counter = ({ title }) => {
-    const time_in3_min = 3 * 60 * 1000;
-    const now_time = new Date().getTime();
+const Counter = ({ title, totalTime, onComplete }) => {
+    // const time_in3_min = 3 * 60 * 1000;
+    // const now_time = new Date().getTime();
 
-    const total_time = time_in3_min + now_time;
+    // const total_time = time_in3_min + now_time;
 
 
 
@@ -25,8 +25,9 @@ const Counter = ({ title }) => {
             <Text size={"lg"}>{title}</Text>
             {/* Time lapse */}
             <Countdown
-                date={total_time}
+                date={totalTime}
                 renderer={renderer}
+                onComplete={onComplete}
             />
         </Stack>
     )

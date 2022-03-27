@@ -1,14 +1,14 @@
-import redis from "redis";
 import { nanoid } from "nanoid";
 import connectDB from "../../../../mongodb/connectDB";
 import Quiz from "../../../../mongodb/models/Quiz";
 import Question from "../../../../mongodb/models/Question";
 import User from "../../../../mongodb/models/User";
 import Attempt from "../../../../mongodb/models/Attempt";
+import Redis from "ioredis";
 
-const REDIS_PORT = 6379;
-
-const client = redis.createClient(REDIS_PORT);
+let client = new Redis(
+    "redis://:c5cc7f5d685a466881f0fc914f0842be@global-quality-tortoise-32273.upstash.io:32273"
+);
 
 export default async function handler(req, res) {
     connectDB();
@@ -69,7 +69,12 @@ async function startQuiz(req, res) {
          * Save the questions in cache database
          */
 
-        client.setex(userId.toString(), 3600, JSON.stringify(questions));
+        let quizData = {
+            questions: questions,
+            duration: quiz.duration,
+        };
+
+        client.set(userId.toString(), JSON.stringify(quizData), "EX", 3600);
 
         var data = [];
 
@@ -95,6 +100,7 @@ async function startQuiz(req, res) {
             duration: quiz.duration,
         });
     } catch (err) {
+        console.log(err);
         return res.status(400).json({
             message: `An error was encountered due to ${err}`,
         });
@@ -115,53 +121,61 @@ async function markQuiz(req, res) {
     /**
      * Retrieve the questions stored in the redis
      */
-    client.get(userId.toString(), async (err, data) => {
-        if (err) {
-            return res.status(400).json({
-                message: "Error fetching cache",
-            });
-        }
-
-        /**
-         * Parse through the questions
-         */
-
-        var dataQuestions = JSON.parse(data);
-
-        if (data !== null) {
-            for (let i = 0; i < dataQuestions.length; i++) {
-                /**
-                 * Start marking the questions by cross checking the answers
-                 */
-                if (
-                    questions[i].selectedOption ===
-                    dataQuestions[i].correctAnswer
-                ) {
-                    score += 1;
-                }
-
-                /**
-                 * Save the marking info into an object for saving
-                 */
-                var object = {
-                    description: dataQuestions[i].description,
-                    selected: questions[i].selectedOption,
-                    questionId: questions[i].quizId,
-                    correctAnswer: dataQuestions[i].correctAnswer,
-                    options: dataQuestions[i].options,
-                };
-                responses.push(object);
+    var quizData = await client.get(userId);
+    var data = JSON.parse(quizData);
+    console.log(data)
+    var { questions: dataQuestions } = data;
+    if (data !== null) {
+        for (let i = 0; i < dataQuestions.length; i++) {
+            /**
+             * Start marking the questions by cross checking the answers
+             */
+            if (
+                questions[i].selectedOption === dataQuestions[i].correctAnswer
+            ) {
+                score += 1;
             }
 
             /**
-             * Update the User Object
+             * Save the marking info into an object for saving
              */
-            await User.updateOne(
-                { _id: userId },
+            var object = {
+                description: dataQuestions[i].description,
+                selected: questions[i].selectedOption,
+                questionId: questions[i].quizId,
+                correctAnswer: dataQuestions[i].correctAnswer,
+                options: dataQuestions[i].options,
+            };
+            responses.push(object);
+        }
+
+        /**
+         * Update the User Object
+         */
+        await User.updateOne(
+            { _id: userId },
+            {
+                $push: {
+                    quizesGiven: {
+                        quizId,
+                        score,
+                        responses,
+                        timeEnded,
+                        timeStarted,
+                        attemptId,
+                    },
+                },
+            }
+        ).then(async (res1) => {
+            /**
+             * Update Quiz Object
+             */
+            await Quiz.updateOne(
+                { _id: quizId },
                 {
                     $push: {
-                        quizzesGiven: {
-                            quizID,
+                        usersParticipated: {
+                            userId,
                             score,
                             responses,
                             timeEnded,
@@ -170,48 +184,29 @@ async function markQuiz(req, res) {
                         },
                     },
                 }
-            ).then(async (res1) => {
-                /**
-                 * Update Quiz Object
-                 */
-                await Quiz.updateOne(
-                    { _id: quizId },
-                    {
-                        $push: {
-                            usersParticipated: {
-                                userId,
-                                score,
-                                responses,
-                                timeEnded,
-                                timeStarted,
-                                attemptId,
-                            },
-                        },
-                    }
-                )
-                    .then(async (res3) => {
-                        /**
-                         * Create new attempt object containing both userId and quizId and unique id for attempt
-                         */
-                        let attempt = new Attempt({
-                            quizId: quizId,
-                            userId: userId,
-                            specId: attemptId,
-                        });
-                        await attempt.save();
-                    })
-                    .then(() => {
-                        return res.status(200).json({
-                            message: "Successfully submitted the quiz",
-                        });
+            )
+                .then(async (res3) => {
+                    /**
+                     * Create new attempt object containing both userId and quizId and unique id for attempt
+                     */
+                    let attempt = new Attempt({
+                        quizId: quizId,
+                        userId: userId,
+                        specId: attemptId,
                     });
-            });
-        } else {
-            return res.status(400).json({
-                message: "No data stored in cache",
-            });
-        }
-    });
+                    await attempt.save();
+                })
+                .then(() => {
+                    return res.status(200).json({
+                        message: "Successfully submitted the quiz",
+                    });
+                });
+        });
+    } else {
+        return res.status(400).json({
+            message: "No data stored in cache",
+        });
+    }
 }
 
 /**
@@ -246,8 +241,9 @@ async function getResponses(req, res) {
             }
         }
 
-        return res.status(200).json(attemptInfo);
+        return res.status(200).json({ quizTitle: quiz.title, attempt: attemptInfo });
     } catch (err) {
+        console.log(err)
         return res.status(400).json({
             message: "Couldn't fetch the responses",
         });

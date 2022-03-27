@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const attemptSchema = new mongoose.Schema({
+const trialSchema = new mongoose.Schema({
     quizId: {
         type: mongoose.Types.ObjectId,
         ref: "Quiz",
@@ -15,7 +15,7 @@ const attemptSchema = new mongoose.Schema({
     },
 });
 
-const Attempt =
-    mongoose.models.Attempt || mongoose.model("Attempt", attemptSchema);
+const Trial =
+    mongoose.models.Trial || mongoose.model("Trial", trialSchema);
 
-export default Attempt;
+export default Trial;

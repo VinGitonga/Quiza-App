@@ -29,8 +29,10 @@ async function createUser(req, res){
 async function getUsers(req, res){
     try {
         let users = await User.find();
+        console.log("This is" + users)
         return res.status(200).json(users)
     } catch (err) {
+        console.log(err)
         return res.status(400).json({
             message:  `Unable to fetch users due to ${err.toString()}`
         });
