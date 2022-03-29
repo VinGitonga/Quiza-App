@@ -123,7 +123,7 @@ async function markQuiz(req, res) {
      */
     var quizData = await client.get(userId);
     var data = JSON.parse(quizData);
-    console.log(data)
+    console.log(data);
     var { questions: dataQuestions } = data;
     if (data !== null) {
         for (let i = 0; i < dataQuestions.length; i++) {
@@ -184,23 +184,22 @@ async function markQuiz(req, res) {
                         },
                     },
                 }
-            )
-                .then(async (res3) => {
-                    /**
-                     * Create new attempt object containing both userId and quizId and unique id for attempt
-                     */
-                    let attempt = new Attempt({
-                        quizId: quizId,
-                        userId: userId,
-                        specId: attemptId,
-                    });
-                    await attempt.save();
-                })
-                .then(() => {
-                    return res.status(200).json({
-                        message: "Successfully submitted the quiz",
-                    });
+            ).then(async (res3) => {
+                /**
+                 * Create new attempt object containing both userId and quizId and unique id for attempt
+                 */
+                let attempt = new Attempt({
+                    quizId: quizId,
+                    userId: userId,
+                    specId: attemptId,
                 });
+                try {
+                    await attempt.save();
+                    return res.status(200).json({ attemptId: attemptId });
+                } catch (err) {
+                    console.log(err);
+                }
+            });
         });
     } else {
         return res.status(400).json({
@@ -216,34 +215,26 @@ async function getResponses(req, res) {
     const { slug } = req.query;
     try {
         let quizId = slug[0];
+        let attemptId = slug[1];
         let quiz = await Quiz.findById(quizId);
-        var query = {
-            quizId: quizId,
-        };
-
-        let attempts = await Attempt.find({
-            quizId: query.quizId,
-        });
 
         /**
          * At this point we loop through the quiza's usersParticipants and attempst as well
          * We point against which attempt's specId corresponds we the participants attemptId
          * Thereafter we dispatch the results to the frontend
          */
-        let i, j;
+        let i;
         for (i = 0; i < quiz.usersParticipated.length; i++) {
-            for (j = 0; j < attempts.length; j++) {
-                if (
-                    attempts[j].specId === quiz.usersParticipated[i].attemptId
-                ) {
-                    var attemptInfo = quiz.usersParticipated[i];
-                }
+            if (attemptId === quiz.usersParticipated[i].attemptId) {
+                var attemptInfo = quiz.usersParticipated[i];
             }
         }
 
-        return res.status(200).json({ quizTitle: quiz.title, attempt: attemptInfo });
+        return res
+            .status(200)
+            .json({ quizTitle: quiz.title, attempt: attemptInfo });
     } catch (err) {
-        console.log(err)
+        console.log(err);
         return res.status(400).json({
             message: "Couldn't fetch the responses",
         });

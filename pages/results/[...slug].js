@@ -13,9 +13,9 @@ import {
     Stack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import Card from "../components/Card";
-import Navbar from "../components/Navbar";
-import Loader from "../components/common/Loader";
+import Card from "../../components/Card";
+import Navbar from "../../components/Navbar";
+import Loader from "../../components/common/Loader";
 import { FiChevronDown, FiChevronRight } from "react-icons/fi";
 import {
     IoCheckmarkDoneOutline,
@@ -24,24 +24,28 @@ import {
     IoDiscOutline,
 } from "react-icons/io5";
 
-import { getQuizAttemptResponses } from "../services/quiz";
+import useSWR from "swr";
+import axios from "axios";
+
+const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const Results = () => {
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const { quizId } = router.query;
-    console.log(quizId);
-    const [attemptInfo, setAttemptInfo] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const { slug } = router.query;
+    const quizId = slug[0];
+    const attemptId = slug[1];
 
-    const fetchAttemptInfo = async (id) => {
-        setLoading(true);
-        let data = await getQuizAttemptResponses(id);
-        console.log(data);
-        setAttemptInfo(data);
-        setLoading(false);
-    };
+    const { data: attemptInfo } = useSWR(
+        () => `/api/quiz/start/${quizId}/${attemptId}`,
+        fetcher
+    );
 
-    useEffect(() => fetchAttemptInfo(quizId), [quizId]);
+    useEffect(() => {
+        if (attemptInfo) {
+            setLoading(false);
+        }
+    }, [attemptInfo]);
 
     return (
         <Box px={8} style={{ fontFamily: "Poppins" }}>
@@ -136,7 +140,7 @@ const QuestionItem = ({ response }) => {
 };
 
 const OptionItem = ({ resp, text }) => (
-    <Stack spacing={4} direction={"row"} alignItems={"center"} >
+    <Stack spacing={4} direction={"row"} alignItems={"center"}>
         <Icon
             as={IoDiscOutline}
             w={4}

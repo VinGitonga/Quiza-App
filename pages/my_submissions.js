@@ -20,7 +20,7 @@ const fetcher = (url) => axios.get(url).then((res) => res.data);
 
 const MySubmissions = () => {
     const { data: attempts } = useSWR("/api/quiz/submissions", fetcher);
-    console.log(attempts)
+    console.log(attempts);
 
     return (
         <Box px={8}>
@@ -82,10 +82,17 @@ const QuizItem = ({ attempt }) => {
                             isRound
                             bg={"gray.300"}
                             onClick={() =>
-                                router.push({
-                                    pathname: "/results",
-                                    query: { quizId: attempt?.quizId?._id },
-                                })
+                                router.push(
+                                    `/results/${attempt?.quizId?._id}/${attempt?.attemptId}`
+                                    // {
+                                    //     pathname: "/results",
+                                    //     query: {
+                                    //         quizId: attempt?.quizId?._id,
+                                    //         attemptId: attempt?.attemptId,
+                                    //     },
+                                    // },
+                                    // "/results"
+                                )
                             }
                         />
                     </Tooltip>
