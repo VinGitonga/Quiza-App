@@ -1,5 +1,6 @@
 import connectDB from "../../../../mongodb/connectDB";
 import Quiz from "../../../../mongodb/models/Quiz";
+import { getSession } from "next-auth/react";
 
 export default async function handler(req, res) {
     connectDB();
@@ -10,10 +11,10 @@ export default async function handler(req, res) {
 }
 
 async function getEnrolledQuizzes(req, res) {
-    const { userId } = req.query;
+    const session = await getSession({ req });
 
     try {
-        let query = { userId: userId };
+        let query = { userId: session.user.id };
 
         let quizzes = await Quiz.find({ "usersEnrolled.userId": query.userId });
 

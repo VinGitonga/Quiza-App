@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
     Accordion,
     AccordionItem,
@@ -12,34 +11,43 @@ import {
     Tooltip,
     HStack,
     Stack,
-    RadioGroup,
-    Radio,
     Text,
 } from "@chakra-ui/react";
 import Card from "../Card";
 import { GrAdd } from "react-icons/gr";
 import { CgTrash } from "react-icons/cg";
 import { FiChevronRight, FiChevronDown, FiEdit3 } from "react-icons/fi";
+import { IoDiscOutline } from "react-icons/io5";
 import { useRouter } from "next/router";
-import { getQuestions } from "../../services/question";
+import { useSession } from "next-auth/react";
+import useSWR from "swr";
+import axios from "axios";
 
-function getCorrectAns(allAns, correctAns) {
+const fetcher = (url) => axios.get(url).then((resp) => resp.data);
+
+/* function getCorrectAns(allAns, correctAns) {
     let correctAnsObj = allAns.filter((obj) => obj.text === correctAns);
     return correctAnsObj[0].text;
-}
+} */
 
-const Questions = ({ quizId }) => {
-    const router = useRouter();
+/**
+ * Method to validate if the current user is the quiz author
+ * returns falsly if the current user is author and vice versa
+ * This is to ensure that the author only can edit and remove questions
+ * Thus disabling the edit and remove buttons
+ */
 
-    const [questions, setQuestions] = useState([]);
+const validateUser = (currentUserId, authorUserId) =>
+    String(currentUserId) === String(authorUserId) ? false : true;
 
-    const fetchQuestions = async (id) => {
-        let data = await getQuestions(id);
-        setQuestions(data);
-    };
+const Questions = ({ quiz }) => {
+    const { data: session } = useSession();
+    const router = useRouter()
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => fetchQuestions(quizId), []);
+    const { data: questions } = useSWR(
+        () => `/api/question/creating/${quiz?.id}`,
+        fetcher
+    );
 
     return (
         <Card>
@@ -58,11 +66,18 @@ const Questions = ({ quizId }) => {
                         isRound
                         bg={"gray.300"}
                         onClick={() =>
-                            router.push({
-                                pathname: "/create_question",
-                                query: { quizId: quizId },
-                            })
+                            router.push(
+                                {
+                                    pathname: "/create_question",
+                                    query: { quizId: quizId },
+                                },
+                                "/create_question"
+                            )
                         }
+                        disabled={validateUser(
+                            session?.user?.id,
+                            quiz?.authorId
+                        )}
                     />
                 </Tooltip>
             </Flex>
@@ -76,6 +91,10 @@ const Questions = ({ quizId }) => {
                             <QuestionItem
                                 key={question?._id}
                                 question={question}
+                                isBtnDisabled={validateUser(
+                                    session?.user?.id?.toString(),
+                                    quiz?.authorId
+                                )}
                             />
                         ))}
                     </>
@@ -85,7 +104,7 @@ const Questions = ({ quizId }) => {
     );
 };
 
-const QuestionItem = ({ question }) => {
+const QuestionItem = ({ question, isBtnDisabled }) => {
     return (
         <AccordionItem my={3}>
             {({ isExpanded }) => (
@@ -116,6 +135,7 @@ const QuestionItem = ({ question }) => {
                                         aria-label={"edit"}
                                         icon={<FiEdit3 />}
                                         isRound
+                                        disabled={isBtnDisabled}
                                         bg={"gray.300"}
                                     />
                                 </Tooltip>
@@ -130,6 +150,7 @@ const QuestionItem = ({ question }) => {
                                         aria-label={"remove"}
                                         icon={<CgTrash />}
                                         isRound
+                                        disabled={isBtnDisabled}
                                         bg={"gray.300"}
                                     />
                                 </Tooltip>
@@ -137,25 +158,29 @@ const QuestionItem = ({ question }) => {
                         </AccordionButton>
                     </Heading>
                     <AccordionPanel pb={4}>
-                        <RadioGroup
-                            defaultValue={getCorrectAns(
-                                question?.options,
-                                question?.correctAnswer
-                            )}
-                        >
-                            <Stack spacing={4} direction={"column"}>
-                                {question?.options?.map((opt, i) => (
-                                    <Radio key={i} value={opt?.text}>
-                                        {opt?.text}
-                                    </Radio>
-                                ))}
-                            </Stack>
-                        </RadioGroup>
+                        {question?.options?.map((opt, i) => (
+                            <OptionItem
+                                key={i}
+                                color={
+                                    question?.correctAnswer === opt?.text
+                                        ? "green"
+                                        : "gray.800"
+                                }
+                                text={opt?.text}
+                            />
+                        ))}
                     </AccordionPanel>
                 </>
             )}
         </AccordionItem>
     );
 };
+
+const OptionItem = ({ color, text }) => (
+    <Stack spacing={4} direction={"row"} alignItems={"center"}>
+        <Icon as={IoDiscOutline} w={4} h={4} color={color} />
+        <Text color={color}>{text}</Text>
+    </Stack>
+);
 
 export default Questions;

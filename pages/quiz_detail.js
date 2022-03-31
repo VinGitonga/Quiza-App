@@ -4,19 +4,31 @@ import Info from "../components/Quiz/Info";
 import Questions from "../components/Quiz/Questions";
 import Navbar from "../components/Navbar";
 import { useRouter } from "next/router";
-import { getQuizDetail } from "../services/quiz";
+// import { getQuizDetail } from "../services/quiz";
+import useSWR from "swr";
+import axios from "axios";
+
+const fetcher = (url) => axios.get(url).then((resp) => resp.data);
 
 const QuizDetails = () => {
     const router = useRouter();
-    const { quizId } = router.query;
-    const [quiz, setQuiz] = useState(null);
+    const [quizId, setQuizId] = useState("");
 
-    const fetchData = async (id) => {
-        let data = await getQuizDetail(id);
-        setQuiz(data);
-    };
+    useEffect(() => {
+        const { quizId: id } = router.query;
+        if (id) {
+            setQuizId(id);
+        }
+    }, [router]);
 
-    useEffect(() => fetchData(quizId), [quizId]);
+    const { data: quiz } = useSWR(() => `/api/quiz/details/${quizId}`, fetcher);
+
+    // const fetchData = async (id) => {
+    //     let data = await getQuizDetail(id);
+    //     setQuiz(data);
+    // };
+
+    // useEffect(() => fetchData(quizId), [router]);
 
     return (
         <Box px={8} style={{ fontFamily: "Poppins" }}>
@@ -33,7 +45,9 @@ const QuizDetails = () => {
                         <Info quiz={quiz} />
                     </GridItem>
                     <GridItem colSpan={{ base: "auto", lg: 7 }}>
-                        <Questions quizId={quizId} />
+                        <Questions
+                            quiz={quiz}
+                        />
                     </GridItem>
                 </SimpleGrid>
             </Box>

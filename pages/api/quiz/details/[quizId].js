@@ -20,5 +20,6 @@ async function getQuizDetails(req, res) {
         description: quiz.description,
         quizCode: quiz.quizCode,
         duration: quiz.duration,
+        authorId: quiz.authorId,
     });
 }

@@ -5,11 +5,11 @@ export default async function handler(req, res) {
     connectDB();
     switch (req.method) {
         case "GET":
-            return getQuizzesByAuthot(req, res);
+            return getQuizzesByAuthor(req, res);
     }
 }
 
-async function getQuizzesByAuthot(req, res) {
+async function getQuizzesByAuthor(req, res) {
     const { userId } = req.query;
 
     try {

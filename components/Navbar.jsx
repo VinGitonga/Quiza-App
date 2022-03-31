@@ -21,32 +21,29 @@ import {
     MenuButton,
     MenuList,
 } from "@chakra-ui/react";
-import {
-    AiOutlineMenu,
-    AiOutlineSearch,
-    AiFillBell,
-} from "react-icons/ai";
+import { AiOutlineMenu, AiOutlineSearch, AiFillBell } from "react-icons/ai";
 import { useRouter } from "next/router";
 import { SiSwarm } from "react-icons/si";
 import { RiUserHeartFill, RiLogoutCircleFill } from "react-icons/ri";
-import { useSession, signOut } from "next-auth/react"
-// import useUser from "../hooks/useUser"
-// import useAuth from "../hooks/useAuth"
+import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
     const bg = useColorModeValue("white", "gray.800");
     const mobileNav = useDisclosure();
     const router = useRouter();
-    const { data } = useSession()
-    console.log(data?.user)
+    const { data } = useSession();
+    console.log(data?.user);
 
     const logout = async () => {
-        const result = await signOut({redirect: false, callbackUrl: "/login"})
-        router.push(result.url)
-    }
+        const result = await signOut({
+            redirect: false,
+            callbackUrl: "/login",
+        });
+        router.push(result.url);
+    };
 
     return (
-        <Box shadow="md">
+        <Box shadow="md" fontFamily={"Poppins"}>
             <chakra.header
                 bg={bg}
                 borderColor="gray.600"
@@ -55,7 +52,11 @@ export default function Navbar() {
                 px={{ base: 2, sm: 4 }}
                 py={4}
             >
-                <Flex alignItems="center" justifyContent="space-between" mx="auto">
+                <Flex
+                    alignItems="center"
+                    justifyContent="space-between"
+                    mx="auto"
+                >
                     <HStack spacing={4} display="flex" alignItems="center">
                         <Box display={{ base: "inline-flex", md: "none" }}>
                             <IconButton
@@ -84,7 +85,12 @@ export default function Navbar() {
                             p={3}
                             color={useColorModeValue("gray.800", "inherit")}
                             rounded="sm"
-                            _hover={{ color: useColorModeValue("gray.800", "gray.600") }}
+                            _hover={{
+                                color: useColorModeValue(
+                                    "gray.800",
+                                    "gray.600"
+                                ),
+                            }}
                         >
                             <AiFillBell />
                             <VisuallyHidden>Notifications</VisuallyHidden>
@@ -123,29 +129,64 @@ export default function Navbar() {
             >
                 <Tabs borderBottomColor="transparent">
                     <TabList>
-                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/quizzes")}>
+                        <Tab
+                            py={4}
+                            m={0}
+                            _focus={{ boxShadow: "none" }}
+                            onClick={() => router.replace("/quizzes")}
+                        >
                             Quizas
                         </Tab>
-                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/my_quizzes")}>
+                        <Tab
+                            py={4}
+                            m={0}
+                            _focus={{ boxShadow: "none" }}
+                            onClick={() => router.replace("/my_quizzes")}
+                        >
                             My Quizas
                         </Tab>
-                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/my_submissions")}>
-                            My Submissions
-                        </Tab>
-                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/create_quiz")}>
-                            Create Quiza
-                        </Tab>
-                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/users")}>
-                            Users
-                        </Tab>
-                        <Tab py={4} m={0} _focus={{ boxShadow: "none" }} onClick={() => router.replace("/quiza")}>
-                            Quiza
-                        </Tab>
+                        {data?.user?.role === "Student" && (
+                            <Tab
+                                py={4}
+                                m={0}
+                                _focus={{ boxShadow: "none" }}
+                                onClick={() =>
+                                    router.replace("/my_submissions")
+                                }
+                            >
+                                My Submissions
+                            </Tab>
+                        )}
+                        {data?.user?.role === "Administrator" && (
+                            <>
+                                <Tab
+                                    py={4}
+                                    m={0}
+                                    _focus={{ boxShadow: "none" }}
+                                    onClick={() =>
+                                        router.replace("/create_quiz")
+                                    }
+                                >
+                                    Create Quiza
+                                </Tab>
+                                <Tab
+                                    py={4}
+                                    m={0}
+                                    _focus={{ boxShadow: "none" }}
+                                    onClick={() => router.replace("/users")}
+                                >
+                                    Users
+                                </Tab>
+                            </>
+                        )}
                     </TabList>
                 </Tabs>
                 <Spacer />
                 <HStack spacing={3} alignItems="center">
-                    <InputGroup display={{ base: "none", lg: "block" }} ml="auto">
+                    <InputGroup
+                        display={{ base: "none", lg: "block" }}
+                        ml="auto"
+                    >
                         <InputLeftElement pointerEvents="none">
                             <AiOutlineSearch />
                         </InputLeftElement>

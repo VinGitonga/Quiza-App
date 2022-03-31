@@ -1,7 +1,6 @@
 import connectDB from "../../../../mongodb/connectDB";
 import Question from "../../../../mongodb/models/Question";
 
-
 export default async function handler(req, res) {
     connectDB();
     switch (req.method) {
@@ -26,7 +25,7 @@ async function createQuestion(req, res) {
         return res.status(200).json(result);
     } catch (err) {
         return res.status(400).json({
-            message: `Unable to create question due to ${err.toString()}`
+            message: `Unable to create question due to ${err.toString()}`,
         });
     }
 }
@@ -36,10 +35,11 @@ async function getQuestions(req, res) {
 
     try {
         let questions = await Question.find({ quizId: quizId });
-        return res.status(200).json(questions)
+        
+        return res.status(200).json(questions);
     } catch (err) {
         return res.status(400).json({
-            message: `Unable to fetch questions due to ${err.toString()}`
+            message: `Unable to fetch questions due to ${err.toString()}`,
         });
     }
 }
