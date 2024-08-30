@@ -69,7 +69,7 @@ const Questions = ({ quiz }) => {
                             router.push(
                                 {
                                     pathname: "/create_question",
-                                    query: { quizId: quizId },
+                                    query: { quizId: quiz?.id },
                                 },
                                 "/create_question"
                             )

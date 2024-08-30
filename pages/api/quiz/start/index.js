@@ -2,7 +2,7 @@ import Redis from "ioredis";
 import { getSession } from "next-auth/react";
 
 let client = new Redis(
-    "redis://:c5cc7f5d685a466881f0fc914f0842be@global-quality-tortoise-32273.upstash.io:32273"
+    "redis-17110.c251.east-us-mz.azure.redns.redis-cloud.com:17110"
 );
 
 export default async function handler(req, res) {

@@ -59,7 +59,7 @@ export default function Register() {
 
         setLoading(true);
         uploadImage(imageData)
-            .then((data) => {
+            .then(async (data) => {
                 var userInfo = {
                     name: name,
                     email: email,
@@ -68,10 +68,13 @@ export default function Register() {
                     image: data.url,
                 };
 
-                register(userInfo).then((resp) => {
+                await register(userInfo).then((resp) => {
+                    console.log('resp', resp)
                     setLoading(false);
                     router.push("/login");
-                });
+                }).catch(err => {
+                    console.log(err)
+                })
             })
             .catch((err) => console.log(err))
             .finally(() => setLoading(false));
