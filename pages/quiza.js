@@ -111,7 +111,6 @@ const Quiz = () => {
         ).then((data) =>
             router.replace(
                 { pathname: "/results", query: { quizId: quizId, attemptId: data.attemptId } },
-                "/results"
             )
         );
     };

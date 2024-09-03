@@ -1,7 +1,7 @@
 import Redis from "ioredis"
 import { getSession } from "next-auth/react";
 
-let client = new Redis("redis-17110.c251.east-us-mz.azure.redns.redis-cloud.com:17110");
+let client = new Redis(process.env.REDIS_URL);
 
 
 export default async function handler(req, res) {

@@ -7,7 +7,7 @@ import Attempt from "../../../../mongodb/models/Attempt";
 import Redis from "ioredis";
 
 let client = new Redis(
-    "redis-17110.c251.east-us-mz.azure.redns.redis-cloud.com:17110"
+    process.env.REDIS_URL
 );
 
 export default async function handler(req, res) {
