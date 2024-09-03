@@ -283,7 +283,7 @@ export default function Register() {
                             onClick={() => router.push("/login")}
                         >
                             {" "}
-                            Don&apos;t have an account? Register
+                            Already have an account?, Login
                         </Link>
                     </Stack>
                 </Box>
