@@ -33,8 +33,8 @@ const Results = () => {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const { slug } = router.query;
-    const quizId = slug[0];
-    const attemptId = slug[1];
+    const quizId = slug?.[0];
+    const attemptId = slug?.[1];
 
     const { data: attemptInfo } = useSWR(
         () => `/api/quiz/start/${quizId}/${attemptId}`,
